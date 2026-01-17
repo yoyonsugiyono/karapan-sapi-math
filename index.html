@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karapan Sapi Matematika Lengkap</title>
+    <style>
+        :root {
+            --madura-red: #D32F2F;
+            --madura-black: #212121;
+            --madura-gold: #FFD700;
+            --sand-color: #e6c288;
+            --sky-color: #87CEEB;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--madura-black);
+            color: white;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* --- UI UTAMA & MENU --- */
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            transition: opacity 0.5s;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Update: Background khusus untuk Menu Utama */
+        #menu-screen {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), 
+                        url('karapansapi.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        #menu-screen h1 {
+            margin-top: 100px;
+            margin-bottom: 10px;
+        }
+
+        #tutorial-screen, #history-screen, #credits-screen, #topic-screen {
+            justify-content: flex-start;
+            padding-top: 40px;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        h1 {
+            color: var(--madura-gold);
+            text-shadow: 2px 2px var(--madura-red);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--madura-gold);
+            margin-bottom: 15px;
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--madura-gold);
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .scrollable-content {
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        .scrollable-content::-webkit-scrollbar { width: 8px; }
+        .scrollable-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
+        .scrollable-content::-webkit-scrollbar-thumb { background: var(--madura-gold); border-radius: 4px; }
+
+        .content-box h3 {
+            color: var(--madura-gold);
+            margin-top: 15px;
+            margin-bottom: 5px;
+            border-bottom: 1px dashed rgba(255,255,255,0.3);
+            padding-bottom: 5px;
+        }
+        .content-box h4 {
+            color: #FFECB3;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+            text-decoration: underline;
+        }
+        .content-box p { line-height: 1.5; margin-bottom: 10px; font-size: 0.95rem; }
+        .content-box ul { list-style-type: none; padding: 0; }
+        .content-box li { margin-bottom: 10px; padding-left: 25px; position: relative; }
+        .content-box li::before { content: "🐂"; position: absolute; left: 0; font-size: 1rem; }
+
+        .btn {
+            background: var(--madura-red);
+            color: white;
+            border: 2px solid var(--madura-gold);
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            margin: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s, background 0.2s;
+            font-weight: bold;
+            min-width: 200px;
+        }
+        .btn:hover { transform: scale(1.05); background: #b71c1c; }
+        .btn-blue { background: #1976D2; }
+        .btn-green { background: #388E3C; }
+        .btn-secondary { background: #616161; border-color: #9E9E9E; }
+
+        /* GRID UNTUK PILIH TOPIK */
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .topic-btn {
+            background: #424242;
+            border: 2px solid var(--madura-gold);
+            color: white;
+            padding: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .topic-btn:hover { background: var(--madura-red); transform: translateY(-3px); }
+        .topic-icon { font-size: 1.5rem; margin-bottom: 5px; }
+
+        .utility-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 200;
+        }
+        .util-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--madura-gold);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .util-btn:hover { background: var(--madura-red); }
+
+        /* --- VISUAL GAME --- */
+        #race-track {
+            flex: 1;
+            background: linear-gradient(to bottom, var(--sky-color) 30%, var(--sand-color) 30%);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 5px solid #5d4037;
+        }
+        .lane {
+            position: absolute;
+            width: 100%;
+            height: 30%;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255,255,255,0.3);
+        }
+        #lane-red { bottom: 35%; }
+        #lane-blue { bottom: 5%; }
+        .finish-line {
+            position: absolute;
+            right: 5%; top: 30%; bottom: 0; width: 20px;
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%), 
+                              linear-gradient(-45deg, #000 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #000 75%), 
+                              linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 20px 20px; background-color: white; z-index: 1;
+        }
+
+        .racer {
+            position: absolute;
+            left: 0;
+            transition: left 0.5s ease-out;
+            width: 180px;
+            height: 100px;
+            z-index: 10;
+        }
+        .racer-visual { position: relative; width: 100%; height: 100%; }
+        .bull-sprite { position: absolute; font-size: 3.5rem; line-height: 0.8; transform: scaleX(-1); top: 10px; }
+        .bull-back { left: 60px; z-index: 1; filter: brightness(0.7) drop-shadow(2px 4px 4px rgba(0,0,0,0.4)); top: 5px; }
+        .kaleles-svg { position: absolute; bottom: 10px; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+        .bull-front { left: 55px; z-index: 3; filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4)); }
+        .jockey { font-size: 2rem; position: absolute; bottom: 25px; left: 5px; z-index: 4; transform: scaleX(-1); }
+        .racer-label {
+            position: absolute; top: -20px; left: 40px;
+            padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;
+            white-space: nowrap; z-index: 10; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .dust {
+            position: absolute; bottom: 10px; left: -10px; width: 40px; height: 20px;
+            background: rgba(139, 69, 19, 0.4); border-radius: 50%; opacity: 0; z-index: 1;
+        }
+        .running .dust { animation: dust-anim 0.5s infinite; }
+        .running .racer-visual { animation: vibration 0.2s infinite; }
+        .running .bull-sprite { animation: gallop 0.4s infinite alternate; }
+
+        @keyframes dust-anim { 0% { transform: scale(0.5) translate(0, 0); opacity: 0.8; } 100% { transform: scale(2) translate(-40px, -15px); opacity: 0; } }
+        @keyframes gallop { 0% { transform: scaleX(-1) translateY(0); } 100% { transform: scaleX(-1) translateY(-3px); } }
+        @keyframes vibration { 0% { transform: translate(0, 0); } 25% { transform: translate(1px, 1px); } 50% { transform: translate(0, 0); } 75% { transform: translate(-1px, 1px); } 100% { transform: translate(0, 0); } }
+
+        /* --- CONTROL PANEL --- */
+        #control-panel {
+            height: 260px;
+            background: #333;
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        }
+        .player-control {
+            flex: 1;
+            background: #424242;
+            border-radius: 10px;
+            padding: 30px 10px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+            border: 2px solid transparent;
+        }
+        .player-control.red { border-color: var(--madura-red); }
+        .player-control.blue { border-color: #1976D2; }
+
+        .question-box {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            background: #212121;
+            padding: 10px 20px;
+            border-radius: 5px;
+            min-width: 150px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+        .opt-btn {
+            background: #616161; border: none; color: white;
+            padding: 15px; font-size: 1.2rem; border-radius: 5px;
+            cursor: pointer; transition: background 0.1s;
+        }
+        .opt-btn:active { background: #757575; }
+        .opt-btn.correct { background: #4CAF50 !important; }
+        .opt-btn.wrong { background: #F44336 !important; }
+
+        .player-control.red .question-box { background-color: #B71C1C; border: 2px solid #FFCDD2; }
+        .player-control.red .opt-btn { background-color: var(--madura-red); border: 1px solid #FF5252; }
+        .player-control.red .opt-btn:hover { background-color: #D50000; }
+
+        .player-control.blue .question-box { background-color: #0D47A1; border: 2px solid #BBDEFB; }
+        .player-control.blue .opt-btn { background-color: #1976D2; border: 1px solid #448AFF; }
+        .player-control.blue .opt-btn:hover { background-color: #0D47A1; }
+
+        .ai-overlay { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: #90CAF9; font-style: italic; }
+        #hud {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 20px;
+            display: flex; gap: 20px; font-size: 1.2rem; z-index: 50;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .btn { width: 100%; padding: 10px; }
+            #control-panel { height: auto; min-height: 280px; flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+            .opt-btn { padding: 10px; font-size: 1rem; }
+            .player-control { flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 10px; }
+            .question-box { font-size: 1.5rem; min-width: 80px; margin-bottom: 0; margin-right: 15px; }
+            .content-box { font-size: 0.9rem; }
+            .utility-bar { top: 10px; right: 10px; }
+            .util-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+            .topic-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop>
+        <source src="saronen.mp3" type="audio/ogg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <div id="game-container">
+        
+        <div class="utility-bar">
+            <button class="util-btn" onclick="toggleMusic()" title="Musik On/Off" id="btn-music">🔇</button>
+            <button class="util-btn" onclick="toggleFullScreen()" title="Full Screen" id="btn-fullscreen">⛶</button>
+        </div>
+
+        <div id="hud">
+            <span id="stage-display">Stage: 1</span>
+            <span id="diff-display">Mode: Mudah</span>
+        </div>
+
+        <div id="race-track">
+            <div style="position: absolute; top: 25%; width: 100%; height: 5px; background: #8D6E63;"></div>
+            <div class="finish-line"></div>
+
+            <div id="lane-red" class="lane">
+                <div class="racer" id="racer-red" style="left: 0%;">
+                    <div class="racer-visual">
+                        <div class="racer-label" style="background: var(--madura-red); color: white; border: 2px solid var(--madura-gold);">MERAH</div>
+                        <div class="bull-sprite bull-back">🐂</div>
+                        <svg class="kaleles-svg" viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10,75 Q30,85 50,70" stroke="#5D4037" stroke-width="5" fill="none" stroke-linecap="round"/>
+                            <rect x="10" y="65" width="25" height="10" fill="#3E2723" rx="2" transform="rotate(-5 22 70)"/>
+                            <path d="M35,70 C60,70 100,65 130,50" stroke="#8D6E63" stroke-width="4" fill="none" />
+                            <path d="M125,50 Q130,30 135,50" stroke="#5D4037" stroke-width="6" fill="none" stroke-linecap="round" />
+                            <circle cx="130" cy="40" r="3" fill="gold" />
+                        </svg>
+                        <div class="bull-sprite bull-front">🐂</div>
+                        <div class="jockey">🧍</div>
+                        <div class="dust"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lane-blue" class="lane">
+                <div class="racer" id="racer-blue" style="left: 0%;">
+                    <div class="racer-visual">
+                        <div class="racer-label" style="background: #1976D2; color: white; border: 2px solid white;">BIRU</div>
+                        <div class="bull-sprite bull-back">🐂</div>
+                        <svg class="kaleles-svg" viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+                             <path d="M10,75 Q30,85 50,70" stroke="#5D4037" stroke-width="5" fill="none" stroke-linecap="round"/>
+                             <rect x="10" y="65" width="25" height="10" fill="#3E2723" rx="2" transform="rotate(-5 22 70)"/>
+                             <path d="M35,70 C60,70 100,65 130,50" stroke="#8D6E63" stroke-width="4" fill="none" />
+                             <path d="M125,50 Q130,30 135,50" stroke="#5D4037" stroke-width="6" fill="none" stroke-linecap="round" />
+                             <circle cx="130" cy="40" r="3" fill="gold" />
+                        </svg>
+                        <div class="bull-sprite bull-front">🐂</div>
+                        <div class="jockey">🧍</div>
+                        <div class="dust"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="control-panel">
+            <div class="player-control red">
+                <div class="question-box" id="q-red">2 + 2</div>
+                <div class="options-grid" id="opt-red"></div>
+            </div>
+            <div class="player-control blue">
+                <div id="p2-ui-content" style="display:contents;">
+                    <div class="question-box" id="q-blue">?</div>
+                    <div class="options-grid" id="opt-blue"></div>
+                </div>
+                <div id="ai-status" class="ai-overlay hidden">
+                    <span>AI Sedang Berpikir...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: MAIN MENU -->
+        <div id="menu-screen" class="screen">
+            <h1>KARAPAN SAPI<br>MATH</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">Permainan Balapan Sapi Khas Madura Sambil Belajar Matematika!</p>
+            <button class="btn btn-blue" onclick="selectMode('pve')">1 Player vs AI</button>
+            <button class="btn btn-green" onclick="selectMode('pvp')">2 Player (Lokal)</button>
+            <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px;" onclick="showTutorial()">Cara Bermain</button>
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px; background: #5D4037; border-color: #8D6E63;" onclick="showHistory()">Sejarah & Filosofi</button>
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px;" onclick="showCredits()">Info Pengembang</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: SELECT TOPIC (NEW) -->
+        <div id="topic-screen" class="screen hidden">
+            <h1>Pilih Materi</h1>
+            <div class="topic-grid">
+                <button class="topic-btn" onclick="selectTopic('kabataku')">
+                    <span class="topic-icon">➕➖</span> Kabataku<br><span style="font-size:0.8rem">(Hitung Campuran)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('measurement')">
+                    <span class="topic-icon">📏⏰</span> Pengukuran<br><span style="font-size:0.8rem">(Jarak & Waktu)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('patterns')">
+                    <span class="topic-icon">🔢</span> Pola Bilangan<br><span style="font-size:0.8rem">(Deret Angka)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('roots')">
+                    <span class="topic-icon">🌿</span> Akar & Pangkat<br><span style="font-size:0.8rem">(Kuadrat & Kubik)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('fractions')">
+                    <span class="topic-icon">🍰</span> Pecahan<br><span style="font-size:0.8rem">(Desimal & Persen)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('geometry')">
+                    <span class="topic-icon">📐</span> Geometri<br><span style="font-size:0.8rem">(Keliling & Luas)</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('roman')">
+                    <span class="topic-icon">🏛️</span> Angka Romawi<br><span style="font-size:0.8rem">(I, V, X, L, C...)</span>
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="backToMenu()">Kembali</button>
+        </div>
+
+        <!-- SCREEN: DIFFICULTY SELECT -->
+        <div id="diff-screen" class="screen hidden">
+            <h1 id="diff-title">Pilih Kesulitan</h1>
+            <button class="btn btn-green" onclick="startGame('easy')">Mudah</button>
+            <button class="btn btn-blue" onclick="startGame('medium')">Sedang</button>
+            <button class="btn" style="background:#d32f2f" onclick="startGame('hard')">Sulit</button>
+            <br>
+            <button class="btn btn-secondary" style="margin-top:20px" onclick="backToTopic()">Kembali</button>
+        </div>
+
+        <!-- SCREEN: TUTORIAL -->
+        <div id="tutorial-screen" class="screen hidden">
+            <h1>Cara Bermain</h1>
+            <div class="content-box">
+                <ul>
+                    <li><strong>Tujuan:</strong> Capai garis finish lebih dulu untuk memenangkan lomba.</li>
+                    <li><strong>Pilih Materi:</strong> Anda bisa memilih materi matematika yang ingin dilatih (Hitungan, Geometri, dll).</li>
+                    <li><strong>Menjawab Soal:</strong> Jawab soal matematika yang muncul di panel bawah.</li>
+                    <li><strong>Jawaban Benar:</strong> Sapi akan berlari maju lebih cepat.</li>
+                    <li><strong>Jawaban Salah:</strong> Sapi akan tersandung (diam sejenak).</li>
+                    <li><strong>Stage:</strong> Terdapat 3 level (Desa, Kecamatan, Final) yang semakin panjang lintasannya.</li>
+                </ul>
+            </div>
+            <button class="btn" onclick="backToMenu()">Kembali ke Menu</button>
+        </div>
+
+        <!-- SCREEN: HISTORY -->
+        <div id="history-screen" class="screen hidden">
+            <h1>Sejarah & Filosofi</h1>
+            <div class="content-box scrollable-content">
+                <h3>1. Sejarah Asal Usul</h3>
+                <p>Karapan sapi berawal dari kebutuhan praktis masyarakat agraris Madura, yang kemudian bertransformasi menjadi tradisi budaya yang megah.</p>
+                <ul>
+                    <li><strong>Pangeran Katandur (Syeh Ahmad Baidawi):</strong> Tradisi ini tidak bisa dilepaskan dari sosok Pangeran Katandur...</li>
+                    <li><strong>Tanah Tandus Menjadi Subur:</strong> Pangeran Katandur memperkenalkan cara membajak sawah menggunakan sepasang bambu...</li>
+                    <li><strong>Dari "Garapan" menjadi "Karapan":</strong> Untuk memotivasi warga agar giat membajak sawah, diadakan lomba membajak...</li>
+                </ul>
+                <h3>2. Filosofi Karapan Sapi</h3>
+                <p>Secara umum, Karapan Sapi melambangkan etos kerja dan harga diri (<em>gengsi</em>) masyarakat Madura.</p>
+                <ul>
+                    <li><strong>Kerja Keras dan Ketangguhan:</strong> Sapi karapan diperlakukan istimewa dengan pijatan dan jamu...</li>
+                    <li><strong>Harga Diri (Prestige):</strong> Memenangkan Karapan Sapi bukan soal hadiah uang, melainkan soal martabat keluarga...</li>
+                </ul>
+                <h3>3. Filosofi Joki (Tukang Tongko)</h3>
+                <p>Joki dalam karapan sapi memegang peranan vital. Ia bukan sekadar pengendara, melainkan simbol kepemimpinan jiwa.</p>
+                <ul>
+                    <li><strong>Pengendali Hawa Nafsu:</strong> Sapi yang berlari kencang ibarat hawa nafsu, Joki adalah akal budi...</li>
+                    <li><strong>Kepercayaan:</strong> Ada ikatan batin antara sapi dan jokinya...</li>
+                </ul>
+                <h3>4. Filosofi Peralatan</h3>
+                <h4>A. Pangonong (The Yoke)</h4>
+                <p>Kayu palang penghubung leher. Melambangkan <strong>persatuan dan gotong royong</strong>. Dua individu harus sehati untuk tujuan yang sama.</p>
+                <h4>B. Kaleles (The Sled)</h4>
+                <p>Tempat joki berdiri tanpa roda. Melambangkan <strong>ketahanan hidup</strong> dalam menghadapi gesekan dan ujian.</p>
+                <h4>C. Pakopak & Rekeng</h4>
+                <p>Penutup mata (fokus tujuan) dan pecut (disiplin/dorongan).</p>
+                <h4>D. Salompor</h4>
+                <p>Hiasan indah sebelum lomba, wujud penghargaan terhadap aset/kemampuan.</p>
+                <h3>5. Musik Saronen</h3>
+                <p>Musik pengiring yang rancak. Terdiri dari 9 instrumen simbol <strong>9 lubang hawa</strong> manusia yang harus dijaga.</p>
+                <hr style="border-color: var(--madura-gold); opacity: 0.3;">
+                <p style="text-align: center; margin-top: 20px;"><em>Karapan Sapi adalah manifestasi jiwa masyarakat Madura: Keras dalam usaha, teguh dalam prinsip.</em></p>
+            </div>
+            <button class="btn" onclick="backToMenu()">Kembali ke Menu</button>
+        </div>
+
+        <!-- SCREEN: CREDITS -->
+        <div id="credits-screen" class="screen hidden">
+            <h1>Info Pengembang</h1>
+            <div class="content-box" style="text-align: center;">
+                <p>Game ini didedikasikan untuk memperkenalkan budaya <strong>Karapan Sapi Madura</strong> melalui media interaktif.</p>
+                <br>
+                <p><strong>Dibuat oleh:</strong></p>
+                <h3 style="color: var(--madura-gold);">Yoyon Sugiyono, S.Pd., M.Pd., Gr.</h3>
+                <p>UPTD SDN Margantoko 2</p>
+                <br>
+                <p style="font-size: 0.9rem; color: #aaa;">Versi 2.0 - Full Materi Matematika SD</p>
+            </div>
+            <button class="btn" onclick="backToMenu()">Kembali ke Menu</button>
+        </div>
+
+        <!-- SCREEN: STAGE CLEAR / GAME OVER -->
+        <div id="result-screen" class="screen hidden">
+            <h1 id="result-title">Tim Merah Menang!</h1>
+            <p id="result-desc">Selamat!</p>
+            <button class="btn" onclick="nextLevelOrRestart()" id="next-btn">Lanjut Stage Berikutnya</button>
+            <button class="btn" style="background:gray" onclick="location.reload()">Menu Utama</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- VARIABLES ---
+        let gameMode = 'pve'; 
+        let currentTopic = 'kabataku'; // Default
+        let difficulty = 'easy';
+        let stage = 1;
+        let isPlaying = false;
+        
+        let posRed = 0;
+        let posBlue = 0;
+        let aiTimer = null;
+        let aiThinkingTime = 2000; 
+
+        // Jawaban Benar saat ini
+        let ansRed = null; 
+        let ansBlue = null;
+
+        const stageConfig = {
+            1: { name: "Antar Desa", distance: 10 },
+            2: { name: "Piala Kecamatan", distance: 8 },
+            3: { name: "Grand Final Madura", distance: 5 }
+        };
+
+        // --- GAME FLOW ---
+
+        function selectMode(mode) {
+            gameMode = mode;
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('topic-screen').classList.remove('hidden'); // Ke layar topik dulu
+            playMusicSafe();
+        }
+
+        function selectTopic(topic) {
+            currentTopic = topic;
+            document.getElementById('topic-screen').classList.add('hidden');
+            document.getElementById('diff-screen').classList.remove('hidden');
+        }
+
+        function backToMenu() {
+            hideAllScreens();
+            document.getElementById('menu-screen').classList.remove('hidden');
+        }
+
+        function backToTopic() {
+            document.getElementById('diff-screen').classList.add('hidden');
+            document.getElementById('topic-screen').classList.remove('hidden');
+        }
+
+        function hideAllScreens() {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => s.classList.add('hidden'));
+        }
+
+        // New Helper Functions
+        function showTutorial() { hideAllScreens(); document.getElementById('tutorial-screen').classList.remove('hidden'); }
+        function showHistory() { hideAllScreens(); document.getElementById('history-screen').classList.remove('hidden'); }
+        function showCredits() { hideAllScreens(); document.getElementById('credits-screen').classList.remove('hidden'); }
+
+        function startGame(diff) {
+            difficulty = diff;
+            hideAllScreens();
+            
+            updateStageDisplay();
+            
+            // Set AI Logic
+            if(gameMode === 'pve') {
+                document.getElementById('p2-ui-content').style.display = 'none';
+                document.getElementById('ai-status').classList.remove('hidden');
+                
+                // AI Speed Adjustment per Difficulty
+                if(diff === 'easy') aiThinkingTime = 3500;
+                if(diff === 'medium') aiThinkingTime = 2500;
+                if(diff === 'hard') aiThinkingTime = 1500;
+            } else {
+                document.getElementById('p2-ui-content').style.display = 'contents';
+                document.getElementById('ai-status').classList.add('hidden');
+            }
+
+            posRed = 0; posBlue = 0;
+            updateVisuals();
+            isPlaying = true;
+
+            generateQuestion('red');
+            if(gameMode === 'pvp') generateQuestion('blue');
+            if(gameMode === 'pve') startAI();
+        }
+
+        function updateStageDisplay() {
+            const config = stageConfig[stage];
+            let diffLabel = difficulty === 'easy' ? "Mudah" : difficulty === 'medium' ? "Sedang" : "Sulit";
+            document.getElementById('stage-display').innerText = `Stage: ${stage} (${config.name})`;
+            document.getElementById('diff-display').innerText = `Materi: ${getTopicName(currentTopic)} (${diffLabel})`;
+        }
+
+        function getTopicName(t) {
+            const names = {
+                'kabataku': 'Kabataku', 'measurement': 'Pengukuran', 'patterns': 'Pola Bilangan',
+                'roots': 'Akar Pangkat', 'fractions': 'Pecahan', 'geometry': 'Geometri', 'roman': 'Romawi'
+            };
+            return names[t] || t;
+        }
+
+        // --- CORE MATH GENERATOR (CENTRALIZED) ---
+
+        function generateQuestion(player) {
+            if (!isPlaying) return;
+
+            let questionData;
+
+            // Route to specific generator based on topic
+            switch(currentTopic) {
+                case 'measurement': questionData = genMeasurement(difficulty); break;
+                case 'patterns': questionData = genPattern(difficulty); break;
+                case 'roots': questionData = genRoots(difficulty); break;
+                case 'fractions': questionData = genFractions(difficulty); break;
+                case 'geometry': questionData = genGeometry(difficulty); break;
+                case 'roman': questionData = genRoman(difficulty); break;
+                default: questionData = genKabataku(difficulty); // Fallback
+            }
+
+            // Save correct answer for checking
+            if (player === 'red') ansRed = questionData.answer;
+            else ansBlue = questionData.answer;
+
+            // Update UI
+            const qEl = document.getElementById(`q-${player}`);
+            const btnContainer = document.getElementById(`opt-${player}`);
+            
+            qEl.innerText = questionData.question;
+            
+            // Adjust font size for long text
+            if(questionData.question.length > 10) qEl.style.fontSize = "1.5rem";
+            else qEl.style.fontSize = "2rem";
+
+            btnContainer.innerHTML = ''; 
+
+            questionData.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(player, opt, btn);
+                btnContainer.appendChild(btn);
+            });
+        }
+
+        // --- SPECIFIC TOPIC GENERATORS ---
+
+        // 1. KABATAKU (Basic Ops)
+        function genKabataku(diff) {
+            let n1, n2, op, ans, q;
+            if (diff === 'easy') {
+                op = Math.random() < 0.5 ? '+' : '-';
+                n1 = rInt(1, 20); n2 = rInt(1, 15);
+                if (op === '-') [n1, n2] = [Math.max(n1,n2), Math.min(n1,n2)]; // No negative
+                ans = op === '+' ? n1+n2 : n1-n2;
+            } else if (diff === 'medium') {
+                op = Math.random() < 0.5 ? 'x' : ':';
+                n1 = rInt(2, 12); n2 = rInt(2, 10);
+                if (op === ':') { ans = n1; n1 = n1 * n2; } // Clean division
+                else ans = n1 * n2;
+            } else { // Hard (Mixed)
+                op = ['+', '-', 'x', ':'][rInt(0,3)];
+                n1 = rInt(10, 50); n2 = rInt(5, 20);
+                if(op === ':') { ans=n1; n1=n1*n2; }
+                else if(op==='x') ans=n1*n2;
+                else if(op==='+') ans=n1+n2;
+                else { ans=n1-n2; if(ans<0) {let t=n1;n1=n2;n2=t;ans=n1-n2;} }
+            }
+            q = `${n1} ${op} ${n2}`;
+            return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+        }
+
+        // 2. PENGUKURAN (Measurement)
+        function genMeasurement(diff) {
+            const units = [
+                { q: "km ke m", m: 1000 }, { q: "m ke cm", m: 100 }, 
+                { q: "jam ke mnt", m: 60 }, { q: "mnt ke dtk", m: 60 }
+            ];
+            let type = units[rInt(0, units.length-1)];
+            let val, ans, q;
+
+            if (diff === 'easy') {
+                val = rInt(1, 10);
+                if(type.q.includes('jam') || type.q.includes('km')) {
+                    q = `${val} ${type.q.split(' ')[0]} = ... ${type.q.split(' ')[2]}`;
+                    ans = val * type.m;
+                } else {
+                    // Simple conversion
+                    q = `${val} ${type.q.split(' ')[0]} = ... ${type.q.split(' ')[2]}`;
+                    ans = val * type.m;
+                }
+            } else if (diff === 'medium') {
+                // e.g. 1.5 m = ... cm
+                val = rInt(1, 9) + 0.5;
+                q = `${val} ${type.q.split(' ')[0]} = ... ${type.q.split(' ')[2]}`;
+                ans = val * type.m;
+            } else {
+                // Hard: Speed or Mixed
+                // Speed: Jarak 100m, Waktu 10d. Kec?
+                let s = rInt(2, 20) * 10;
+                let t = rInt(2, 10);
+                let v = s/t;
+                // Ensure integer result mostly
+                while(s % t !== 0) { s+=10; }
+                v = s/t;
+                q = `Jarak ${s}m, Waktu ${t}d. Kecepatan?`;
+                ans = v; // m/s implied
+                return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+            }
+            return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+        }
+
+        // 3. POLA BILANGAN (Patterns)
+        function genPattern(diff) {
+            let start = rInt(1, 10);
+            let step = rInt(2, 5);
+            let seq = [];
+            
+            if(diff === 'easy') {
+                // Arithmetic
+                for(let i=0; i<4; i++) seq.push(start + (i*step));
+            } else if (diff === 'medium') {
+                // Geometric or double step
+                step = rInt(2,3);
+                for(let i=0; i<4; i++) seq.push(start * Math.pow(step, i));
+            } else {
+                // Fibonacci
+                let a=rInt(1,5), b=rInt(1,5);
+                seq = [a, b, a+b, a+b+b];
+            }
+            
+            let ans = seq.pop(); // Remove last
+            let q = seq.join(', ') + ', ...?';
+            return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+        }
+
+        // 4. AKAR & PANGKAT
+        function genRoots(diff) {
+            let base, ans, q;
+            if(diff === 'easy') {
+                // Squares
+                base = rInt(2, 12);
+                q = `${base}² = ?`;
+                ans = base * base;
+            } else if (diff === 'medium') {
+                // Sqrt
+                ans = rInt(2, 15);
+                base = ans * ans;
+                q = `√${base} = ?`;
+            } else {
+                // Cubes
+                base = rInt(2, 6);
+                q = `${base}³ = ?`;
+                ans = base * base * base;
+            }
+            return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+        }
+
+        // 5. PECAHAN (Fractions)
+        function genFractions(diff) {
+            // Simplified: Decimal conversions or Percentages
+            // To make buttons easy, we'll ask for decimal/integer value
+            let num, den, ans, q;
+            
+            if(diff === 'easy') {
+                // 1/2 = 0.5
+                den = [2, 4, 10][rInt(0,2)];
+                num = 1;
+                q = `${num}/${den} = ... (desimal)`;
+                ans = num/den;
+            } else if (diff === 'medium') {
+                // Percent: 50% = 0.5
+                let p = rInt(1, 9) * 10;
+                q = `${p}% = ... (desimal)`;
+                ans = p/100;
+            } else {
+                // Add fractions with same denominator: 1/5 + 2/5 = ?
+                let d = rInt(3, 9);
+                let n1 = rInt(1, d-2);
+                let n2 = rInt(1, d-n1-1);
+                q = `${n1}/${d} + ${n2}/${d} = ...`;
+                // Answer format string "x/y"
+                ans = `${n1+n2}/${d}`;
+                return { question: q, answer: ans, options: generateFractionDistractors(n1+n2, d) };
+            }
+            return { question: q, answer: ans, options: generateNumericDistractors(ans, true) };
+        }
+
+        // 6. GEOMETRI
+        function genGeometry(diff) {
+            let s, p, l, ans, q;
+            if(diff === 'easy') {
+                // Keliling Persegi
+                s = rInt(2, 15);
+                q = `Sisi persegi ${s}. Keliling?`;
+                ans = s * 4;
+            } else if (diff === 'medium') {
+                // Luas Persegi Panjang
+                p = rInt(5, 15); l = rInt(2, 10);
+                q = `P=${p}, L=${l}. Luas?`;
+                ans = p * l;
+            } else {
+                // Reverse: Luas 50, P 10, L?
+                l = rInt(3, 10); p = rInt(5, 12);
+                let area = p * l;
+                q = `Luas=${area}, P=${p}. Lebar?`;
+                ans = l;
+            }
+            return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+        }
+
+        // 7. ROMAWI
+        function genRoman(diff) {
+            const map = {1:'I', 5:'V', 10:'X', 50:'L', 100:'C', 500:'D', 1000:'M'};
+            let val, ans, q;
+            
+            // Convert Int to Roman helper (Simplified for game range)
+            function toRoman(num) {
+                const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+                let roman = '';
+                for (let i in lookup) {
+                    while (num >= lookup[i]) { roman += i; num -= lookup[i]; }
+                }
+                return roman;
+            }
+
+            if(diff === 'easy') val = rInt(1, 10);
+            else if (diff === 'medium') val = rInt(11, 49);
+            else val = rInt(50, 150);
+
+            // 50% chance: Roman to Int, or Int to Roman
+            if(Math.random() < 0.5) {
+                q = `${val} = ... (Romawi)`;
+                ans = toRoman(val);
+                return { question: q, answer: ans, options: generateRomanDistractors(ans, val) };
+            } else {
+                let r = toRoman(val);
+                q = `${r} = ... (Angka)`;
+                ans = val;
+                return { question: q, answer: ans, options: generateNumericDistractors(ans) };
+            }
+        }
+
+        // --- HELPER GENERATORS ---
+
+        function rInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function generateNumericDistractors(correct, isDecimal=false) {
+            let opts = new Set([correct]);
+            while(opts.size < 4) {
+                let offset = isDecimal ? (rInt(-5, 5) / 10) : rInt(-5, 5);
+                let val = correct + offset;
+                if(isDecimal) val = parseFloat(val.toFixed(2)); // Fix float precision
+                if(val !== correct && val >= 0) opts.add(val);
+            }
+            return Array.from(opts).sort(() => Math.random() - 0.5);
+        }
+
+        function generateFractionDistractors(num, den) {
+            let opts = new Set([`${num}/${den}`]);
+            while(opts.size < 4) {
+                let n = num + rInt(-2, 2);
+                let d = den + rInt(-1, 1);
+                if(n>0 && d>0 && `${n}/${d}` !== `${num}/${den}`) opts.add(`${n}/${d}`);
+            }
+            return Array.from(opts).sort(() => Math.random() - 0.5);
+        }
+
+        function generateRomanDistractors(correctRoman, intVal) {
+            // Simply shift the integer value and convert back to Roman
+            let opts = new Set([correctRoman]);
+            function toRoman(num) {
+                const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+                let roman = '';
+                for (let i in lookup) { while (num >= lookup[i]) { roman += i; num -= lookup[i]; } }
+                return roman;
+            }
+            while(opts.size < 4) {
+                let offset = rInt(-5, 5);
+                let v = intVal + offset;
+                if(v > 0 && v !== intVal) opts.add(toRoman(v));
+            }
+            return Array.from(opts).sort(() => Math.random() - 0.5);
+        }
+
+        // --- GAMEPLAY LOGIC ---
+
+        function checkAnswer(player, value, btnElement) {
+            if(!isPlaying) return;
+            const correct = (player === 'red' ? ansRed : ansBlue);
+
+            // Compare loose (==) for string/number mix
+            if (value == correct) {
+                btnElement.classList.add('correct');
+                moveRacer(player);
+                setTimeout(() => generateQuestion(player), 200);
+            } else {
+                btnElement.classList.add('wrong');
+                stumbleRacer(player);
+            }
+        }
+
+        function moveRacer(player) {
+            if(!isPlaying) return;
+            const step = stageConfig[stage].distance;
+            if (player === 'red') posRed += step + Math.random();
+            else posBlue += step + Math.random();
+
+            const racer = document.getElementById(`racer-${player}`);
+            racer.classList.add('running');
+            setTimeout(() => racer.classList.remove('running'), 500);
+
+            updateVisuals();
+            checkWin();
+        }
+
+        function stumbleRacer(player) {
+            const racer = document.getElementById(`racer-${player}`);
+            const visual = racer.querySelector('.racer-visual');
+            visual.style.transform = "translateX(-10px) rotate(-5deg)";
+            setTimeout(() => { visual.style.transform = "none"; }, 300);
+        }
+
+        function updateVisuals() {
+            let vRed = posRed > 90 ? 90 : posRed;
+            let vBlue = posBlue > 90 ? 90 : posBlue;
+            document.getElementById('racer-red').style.left = vRed + '%';
+            document.getElementById('racer-blue').style.left = vBlue + '%';
+        }
+
+        function checkWin() {
+            if (posRed >= 90 || posBlue >= 90) {
+                isPlaying = false;
+                clearTimeout(aiTimer);
+                
+                let winner = "";
+                if (posRed >= 90 && posBlue >= 90) winner = "Seri!";
+                else if (posRed >= 90) winner = "Tim Merah (Anda)";
+                else winner = "Tim Biru";
+
+                showResult(winner);
+            }
+        }
+
+        function startAI() {
+            if(!isPlaying) return;
+            const randomTime = aiThinkingTime + (Math.random() * 1000 - 500);
+            aiTimer = setTimeout(() => {
+                if(!isPlaying) return;
+                // AI Accuracy based on diff
+                let acc = difficulty === 'hard' ? 0.9 : difficulty === 'medium' ? 0.7 : 0.5;
+                if(Math.random() < acc) moveRacer('blue');
+                if(isPlaying && posBlue < 90) startAI();
+            }, randomTime);
+        }
+
+        function showResult(winner) {
+            document.getElementById('result-screen').classList.remove('hidden');
+            const title = document.getElementById('result-title');
+            const desc = document.getElementById('result-desc');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (winner.includes("Merah") || (gameMode === 'pvp' && winner.includes("Merah"))) {
+                title.innerText = "🏆 MENANG! 🏆"; title.style.color = "gold";
+                desc.innerText = `${winner} juara di ${stageConfig[stage].name}!`;
+                if(stage < 3) {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.innerText = "Lanjut ke Stage Berikutnya";
+                    nextBtn.onclick = nextLevel;
+                } else {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.innerText = "Tamatkan Game (Reset)";
+                    nextBtn.onclick = () => location.reload();
+                }
+            } else {
+                title.innerText = "KALAH..."; title.style.color = "silver";
+                desc.innerText = `${winner} lebih cepat. Coba lagi!`;
+                nextBtn.innerText = "Ulangi Stage Ini";
+                nextBtn.onclick = () => startGame(difficulty);
+            }
+        }
+
+        function nextLevel() { stage++; startGame(difficulty); }
+        function nextLevelOrRestart() { if(stage >= 3) location.reload(); else nextLevel(); }
+
+        // --- UTILS ---
+        function playMusicSafe() {
+            const bgm = document.getElementById('bgm');
+            bgm.volume = 1.0; 
+            if(bgm.paused) {
+                const p = bgm.play();
+                if (p !== undefined) {
+                    p.then(_ => { document.getElementById('btn-music').innerText = "🔊"; })
+                     .catch(e => { if(e.name !== 'AbortError') console.log("Audio prevented"); });
+                }
+            }
+        }
+        function toggleMusic() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('btn-music');
+            if (bgm.paused) {
+                const p = bgm.play();
+                if (p !== undefined) p.then(_ => btn.innerText="🔊").catch(e=>{});
+            } else { bgm.pause(); btn.innerText="🔇"; }
+        }
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{});
+            else if (document.exitFullscreen) document.exitFullscreen();
+        }
+    </script>
+</body>
+</html>
