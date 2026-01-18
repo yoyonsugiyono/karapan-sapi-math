@@ -213,6 +213,24 @@
             overflow: hidden;
             border-bottom: 5px solid #5d4037;
         }
+
+        /* Style baru untuk kerumunan penonton */
+        .crowd-layer {
+            position: absolute;
+            top: 24%; /* Posisi di cakrawala antara langit dan pasir */
+            width: 100%;
+            height: 40px;
+            /* Membuat pola kerumunan abstrak menggunakan gradient */
+            background-image: 
+                radial-gradient(circle at 50% 100%, #8D6E63 8px, transparent 8.5px),
+                radial-gradient(circle at 50% 100%, #6D4C41 6px, transparent 6.5px);
+            background-size: 20px 25px, 15px 20px;
+            background-position: 0 0, 7px -5px;
+            background-repeat: repeat-x;
+            z-index: 0; /* Di belakang jalur balap */
+            opacity: 0.8;
+        }
+
         .lane {
             position: absolute;
             width: 100%;
@@ -360,7 +378,8 @@
         </div>
 
         <div id="race-track">
-            <div style="position: absolute; top: 25%; width: 100%; height: 5px; background: #8D6E63;"></div>
+            <!-- Menambahkan layer kerumunan penonton di latar belakang -->
+            <div class="crowd-layer"></div>
             <div class="finish-line"></div>
 
             <div id="lane-red" class="lane">
@@ -550,13 +569,17 @@
         <!-- SCREEN: CREDITS -->
         <div id="credits-screen" class="screen hidden">
             <h1>Info Pengembang</h1>
+            <!-- Added scrollable-content class here -->
             <div class="content-box scrollable-content" style="text-align: center;">
+                <!-- GANTI src DI BAWAH INI DENGAN FILE FOTO ANDA (misal: 'foto_yoyon.jpg') -->
                 <img src="yoyonsugiyono.jpg" alt="Foto Pengembang" class="dev-photo">
+                
                 <p>Game ini didedikasikan untuk memperkenalkan budaya <strong>Karapan Sapi Madura</strong> melalui media interaktif.</p>
                 <br>
                 <p><strong>Dibuat oleh:</strong></p>
                 <h3 style="color: var(--madura-gold);">Yoyon Sugiyono, S.Pd., M.Pd., Gr.</h3>
                 <p>UPTD SDN Margantoko 2</p>
+                <p>Saran, Kritik dan Konsultasi: 082331769605</p>
                 <br>
                 <p style="font-size: 0.9rem; color: #aaa;">Versi 2.0 - Full Materi Matematika SD</p>
             </div>
