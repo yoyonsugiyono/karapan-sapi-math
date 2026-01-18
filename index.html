@@ -425,10 +425,12 @@
             <p style="font-size: 1.2rem; margin-bottom: 20px;">Permainan Balapan Sapi Khas Madura Sambil Belajar Matematika!</p>
             <button class="btn btn-blue" onclick="selectMode('pve')">1 Player vs AI</button>
             <button class="btn btn-green" onclick="selectMode('pvp')">2 Player (Lokal)</button>
-            <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px;" onclick="showTutorial()">Cara Bermain</button>
-                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px; background: #5D4037; border-color: #8D6E63;" onclick="showHistory()">Sejarah & Filosofi</button>
-                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 10px;" onclick="showCredits()">Info Pengembang</button>
+            
+            <!-- UPDATE: Mengurangi gap dan margin agar tombol lebih rapat -->
+            <div style="margin-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 8px; margin: 2px;" onclick="showTutorial()">Cara Bermain</button>
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 8px; margin: 2px; background: #5D4037; border-color: #8D6E63;" onclick="showHistory()">Sejarah & Filosofi</button>
+                <button class="btn btn-secondary" style="min-width: 250px; font-size: 1rem; padding: 8px; margin: 2px;" onclick="showCredits()">Info Pengembang</button>
             </div>
         </div>
 
@@ -551,7 +553,8 @@
         <!-- SCREEN: CREDITS -->
         <div id="credits-screen" class="screen hidden">
             <h1>Info Pengembang</h1>
-            <div class="content-box" style="text-align: center;">
+            <!-- Added scrollable-content class here -->
+            <div class="content-box scrollable-content" style="text-align: center;">
                 <!-- GANTI src DI BAWAH INI DENGAN FILE FOTO ANDA (misal: 'foto_yoyon.jpg') -->
                 <img src="yoyonsugiyono.jpg" alt="Foto Pengembang" class="dev-photo">
                 
@@ -634,9 +637,23 @@
         }
 
         // New Helper Functions
-        function showTutorial() { hideAllScreens(); document.getElementById('tutorial-screen').classList.remove('hidden'); }
-        function showHistory() { hideAllScreens(); document.getElementById('history-screen').classList.remove('hidden'); }
-        function showCredits() { hideAllScreens(); document.getElementById('credits-screen').classList.remove('hidden'); }
+        function showTutorial() { 
+            hideAllScreens(); 
+            document.getElementById('tutorial-screen').classList.remove('hidden'); 
+            document.getElementById('btn-home').style.display = 'flex'; // Tampilkan tombol Home
+        }
+        
+        function showHistory() { 
+            hideAllScreens(); 
+            document.getElementById('history-screen').classList.remove('hidden'); 
+            document.getElementById('btn-home').style.display = 'flex'; // Tampilkan tombol Home
+        }
+        
+        function showCredits() { 
+            hideAllScreens(); 
+            document.getElementById('credits-screen').classList.remove('hidden'); 
+            document.getElementById('btn-home').style.display = 'flex'; // Tampilkan tombol Home
+        }
 
         function startGame(diff) {
             difficulty = diff;
