@@ -367,6 +367,7 @@
     <div id="game-container">
         
         <div class="utility-bar">
+            <!-- Menambahkan ID btn-home dan fungsi quitToMenu -->
             <button class="util-btn" onclick="quitToMenu()" title="Kembali ke Menu Utama" id="btn-home" style="display:none;">🏠</button>
             <button class="util-btn" onclick="toggleMusic()" title="Musik On/Off" id="btn-music">🔇</button>
             <button class="util-btn" onclick="toggleFullScreen()" title="Full Screen" id="btn-fullscreen">⛶</button>
@@ -579,11 +580,22 @@
                 <p><strong>Dibuat oleh:</strong></p>
                 <h3 style="color: var(--madura-gold);">Yoyon Sugiyono, S.Pd., M.Pd., Gr.</h3>
                 <p>UPTD SDN Margantoko 2</p>
-                <p>Saran, Kritik dan Konsultasi: 082331769605</p>
                 <br>
                 <p style="font-size: 0.9rem; color: #aaa;">Versi 2.0 - Full Materi Matematika SD</p>
             </div>
             <button class="btn" onclick="backToMenu()">Kembali ke Menu</button>
+        </div>
+
+        <!-- SCREEN: QUIT CONFIRMATION (NEW) -->
+        <div id="quit-screen" class="screen hidden" style="z-index: 300;">
+            <div class="content-box" style="text-align: center; max-width: 400px;">
+                <h2>Keluar Permainan?</h2>
+                <p>Permainan yang sedang berjalan akan dihentikan.</p>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-green" onclick="confirmQuit()">Ya, Keluar</button>
+                    <button class="btn" style="background: #555;" onclick="cancelQuit()">Batal</button>
+                </div>
+            </div>
         </div>
 
         <!-- SCREEN: STAGE CLEAR / GAME OVER (FIXED) -->
@@ -608,6 +620,10 @@
         let posBlue = 0;
         let aiTimer = null;
         let aiThinkingTime = 2000; 
+
+        // Score Tracking (NEW)
+        let scoreRed = 0;
+        let scoreBlue = 0;
 
         // Jawaban Benar saat ini
         let ansRed = null; 
@@ -679,6 +695,15 @@
             difficulty = diff;
             hideAllScreens();
             
+            // PASTIKAN tombol home muncul
+            document.getElementById('btn-home').style.display = 'flex';
+
+            // RESET Skor jika mulai dari Stage 1
+            if(stage === 1) {
+                scoreRed = 0;
+                scoreBlue = 0;
+            }
+
             updateStageDisplay();
             
             // Set AI Logic
@@ -1079,23 +1104,56 @@
             const desc = document.getElementById('result-desc');
             const nextBtn = document.getElementById('next-btn');
             
-            if (winner.includes("Merah") || (gameMode === 'pvp' && winner.includes("Merah"))) {
-                title.innerText = "🏆 MENANG! 🏆"; title.style.color = "gold";
-                desc.innerText = `${winner} juara di ${stageConfig[stage].name}!`;
+            // Logic Penambahan Skor
+            if (winner.includes("Merah")) scoreRed++;
+            else if (winner.includes("Biru")) scoreBlue++;
+
+            // LOGIKA TAMPILAN
+            if (gameMode === 'pvp') {
+                // PVP MODE: Selalu lanjut stage, siapapun pemenangnya
+                title.innerText = winner.includes("Seri") ? "SERI!" : `🏆 ${winner.toUpperCase()} MENANG! 🏆`;
+                title.style.color = "gold";
+                
+                // Tampilkan Skor Sementara
+                desc.innerHTML = `${winner} memenangkan balapan di ${stageConfig[stage].name}!<br><br>
+                                  <strong>Skor Sementara:</strong><br>
+                                  <span style="color:#FF5252">Merah: ${scoreRed}</span> - <span style="color:#448AFF">Biru: ${scoreBlue}</span>`;
+                
                 if(stage < 3) {
                     nextBtn.style.display = 'inline-block';
                     nextBtn.innerText = "Lanjut ke Stage Berikutnya";
                     nextBtn.onclick = nextLevel;
                 } else {
                     nextBtn.style.display = 'inline-block';
+                    // Tentukan Juara Umum
+                    let finalMsg = scoreRed > scoreBlue ? "<span style='color:gold'>TIM MERAH JUARA UMUM!</span>" : 
+                                   scoreBlue > scoreRed ? "<span style='color:gold'>TIM BIRU JUARA UMUM!</span>" : "HASIL IMBANG!";
+                    
+                    desc.innerHTML += `<br><br>🏁 <strong>GAME OVER</strong> 🏁<br>${finalMsg}`;
                     nextBtn.innerText = "Tamatkan Game (Reset)";
                     nextBtn.onclick = () => location.reload();
                 }
+
             } else {
-                title.innerText = "KALAH..."; title.style.color = "silver";
-                desc.innerText = `${winner} lebih cepat. Coba lagi!`;
-                nextBtn.innerText = "Ulangi Stage Ini";
-                nextBtn.onclick = () => startGame(difficulty);
+                // PVE MODE (Lawan AI): Menang lanjut, Kalah ulang
+                if (winner.includes("Merah")) {
+                    title.innerText = "🏆 MENANG! 🏆"; title.style.color = "gold";
+                    desc.innerText = `${winner} juara di ${stageConfig[stage].name}!`;
+                    if(stage < 3) {
+                        nextBtn.style.display = 'inline-block';
+                        nextBtn.innerText = "Lanjut ke Stage Berikutnya";
+                        nextBtn.onclick = nextLevel;
+                    } else {
+                        nextBtn.style.display = 'inline-block';
+                        nextBtn.innerText = "Tamatkan Game (Reset)";
+                        nextBtn.onclick = () => location.reload();
+                    }
+                } else {
+                    title.innerText = "KALAH..."; title.style.color = "silver";
+                    desc.innerText = `${winner} lebih cepat. Coba lagi!`;
+                    nextBtn.innerText = "Ulangi Stage Ini";
+                    nextBtn.onclick = () => startGame(difficulty);
+                }
             }
         }
 
@@ -1104,24 +1162,28 @@
 
         // --- UTILS ---
         
-        // UPDATE: Fungsi untuk keluar ke menu utama
+        // UPDATE: Menggunakan Modal Custom, bukan confirm()
         function quitToMenu() {
-            // Jika sedang bermain, minta konfirmasi
             if (isPlaying) {
-                if (!confirm("Apakah Anda yakin ingin kembali ke Menu Utama? Permainan akan dihentikan.")) {
-                    return;
-                }
-                // Hentikan permainan
-                isPlaying = false;
-                clearTimeout(aiTimer);
+                // Show custom modal instead of native confirm
+                document.getElementById('quit-screen').classList.remove('hidden');
+            } else {
+                // Not playing (in topic select/diff select), just go back
+                backToMenu();
             }
-            
-            // Reset state permainan sederhana (opsional, agar saat mulai lagi bersih)
-            posRed = 0; 
-            posBlue = 0;
+        }
+
+        function confirmQuit() {
+            document.getElementById('quit-screen').classList.add('hidden');
+            isPlaying = false;
+            clearTimeout(aiTimer);
+            posRed = 0; posBlue = 0;
             updateVisuals();
-            
             backToMenu();
+        }
+
+        function cancelQuit() {
+            document.getElementById('quit-screen').classList.add('hidden');
         }
 
         function playMusicSafe() {
